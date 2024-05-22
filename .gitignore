@@ -1,0 +1,21 @@
+# Dataset
+*.csv
+dataset/
+
+# Debug
+.vscode
+
+# Python
+__pycache__/
+
+# Python packaging
+*.egg-info/
+
+# Environments
+venv/
+
+# Pytorch
+*.pth
+
+# Logs
+logs/

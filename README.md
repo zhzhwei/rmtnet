@@ -1,0 +1,1 @@
+Implementation based on paper [A COVID‑19 medical image classification algorithm based on Transformer](https://www.nature.com/articles/s41598-023-32462-2).

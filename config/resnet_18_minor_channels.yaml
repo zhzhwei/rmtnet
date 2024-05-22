@@ -1,0 +1,45 @@
+NAME: resnet_18_minor_channels
+
+SYSTEM:
+  GPU: True
+
+DIRS:
+  DATA: '../dataset'
+  WEIGHTS: './weights/'
+  OUTPUTS: './outputs/'
+  LOGS: './logs/'
+
+DATA:
+  DEBUG: False
+  INP_CHANNEL: 3
+  SIZE: (256, 256)
+  INTERPOLATION: False
+
+  CSV:
+    TRAIN: "dataset/37_1/train_slice.csv"
+    VALID: "dataset/37_1/valid_slice.csv"
+
+TRAIN:
+  NUM_CYCLES: 1
+  EPOCHES: 20
+  SLICE_LEVEL_BATCH_SIZE: 16
+  SCAN_LEVEL_BATCH_SIZE: 4
+  VOTING: "majority"
+
+SOLVER:
+  OPTIMIZER: 'adam'
+  SCHEDULER: 'cyclical'
+  WARMUP_LENGTH: 0
+  GD_STEPS: 1
+  BASE_LR: 1e-5
+  WEIGHT_DECAY: 1e-2
+  WEIGHT_DECAY_BIAS: 0.0
+  
+LOSS:
+  NAME: 'ce'
+  WEIGHTED_LOSS: False
+
+MODEL:
+  NAME: "resnet18"
+  PRETRAINED: False
+  NUM_CLASSES: 4
