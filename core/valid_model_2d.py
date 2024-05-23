@@ -74,7 +74,7 @@ def valid_model_2d(cfg, epoch, model, validloader, criterion, voting, best_metri
         scan_labels.extend(label.detach().cpu().numpy().tolist())
         losses.update(scan_loss.item(), label_tensor.size(0))
         
-        tbar.set_description("VALID: %.9f" % (losses.avg))
+        tbar.set_description("VALID: epoch: %d, valid loss: %.9f" % (epoch + 1, losses.avg))
 
     # Calculate Metrics
     accuracy = accuracy_score(scan_labels, scan_preds)

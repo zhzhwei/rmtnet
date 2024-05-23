@@ -111,7 +111,7 @@ def build_dataloader_2d(cfg, mode="train"):
         dataset = Subset(dataset, np.random.choice(np.arange(len(dataset)), 64))
 
     dataloader = DataLoader(
-        dataset, cfg.TRAIN.SCAN_LEVEL_BATCH_SIZE, pin_memory=False, shuffle=True, drop_last=False, num_workers=12
+        dataset, cfg.TRAIN.SCAN_LEVEL_BATCH_SIZE, pin_memory=False, shuffle=True, drop_last=False, num_workers=8
     )
     return dataloader
 

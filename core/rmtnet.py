@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange
+from torchvision.models import resnet50
 from ViT import ViT
 from VT import Transformer
 from LMHSA import LightMutilHeadSelfAttention
@@ -73,24 +74,24 @@ class RMTNet(nn.Module):
         )
     
     def forward(self, x):
-        x = self.stem(x)  # [B, 64, 128, 128]
+        x = self.stem(x)  # input: [B, 3, 256, 256], output: [B, 64, 128, 128]
 
         # Stage 1: ViT
-        x = self.vit(x) # [B, 65, 768]
+        x = self.vit(x) # input: [B, 64, 128, 128], output: [B, 65, 768]
         
         # Stage 2: VT
-        x = self.vt(x) # [B, 65, 768]
+        x = self.vt(x) # input: [B, 65, 768], output: [B, 65, 768]
         
         # Stage 3: LMHSA
         B, N, C = x.shape
         cls_token, x = x[:, 0], x[:, 1:]  # The class token is at the beginning
         H = W = int(np.sqrt(N - 1))  # Subtract 1 to account for the class token
-        x = rearrange(x, 'b (h w) c -> b c h w', h=H, w=W) # [B, 768, 8, 8]
-        x = self.lmhsa(x) # [B, 768, 8, 8]
+        x = rearrange(x, 'b (h w) c -> b c h w', h=H, w=W) # output: [B, 768, 8, 8]
+        x = self.lmhsa(x) # input: [B, 768, 8, 8], output: [B, 768, 8, 8]
         
         # Classification head
-        x = x.mean(dim=[2, 3])  # Global average pooling [B, 768]
+        x = x.mean(dim=[2, 3])  # Global average pooling, input: [B, 768, 8, 8], output: [B, 768]
         x = torch.cat([cls_token, x], dim=1)  # Add the class token back 
-        x = self.fc(x) # [B, 4]
+        x = self.fc(x) # input: [B, 768], output: [B, 4]
         
         return x

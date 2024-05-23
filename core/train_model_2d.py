@@ -80,7 +80,7 @@ def train_model_2d(cfg, epoch, model, trainloader, criterion, scheduler, optimiz
         losses.update(scan_loss.item(), label_tensor.size(0))
         
         tbar.set_description(
-            "TRAIN: Epoch: %d, Train loss: %.9f, learning rate: %.9f"
+            "TRAIN: epoch: %d, train loss: %.9f, learning rate: %.9f"
             % (epoch + 1, losses.avg, optimizer.param_groups[-1]["lr"])
         )
 

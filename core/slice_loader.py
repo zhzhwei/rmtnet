@@ -90,6 +90,6 @@ def build_dataloader(cfg, mode="train"):
         pin_memory=False,
         shuffle=shuffle,
         drop_last=drop_last,
-        num_workers=12,
+        num_workers=8,
     )
     return dataloader
