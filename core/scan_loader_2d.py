@@ -39,7 +39,7 @@ class ScanLoader2D(Dataset):
         np.random.seed(42)
         rng = np.random.default_rng()
         indices = np.arange(len(slices))
-        replace = len(indices) < 16
+        replace = len(indices) < 32
         chosen_indices = rng.choice(indices, size=32, replace=replace)  
         slices = [slices[i] for i in chosen_indices]
 

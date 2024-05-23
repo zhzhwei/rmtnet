@@ -10,6 +10,7 @@ from LMHSA import LightMutilHeadSelfAttention
 class Stem(nn.Module):
     def __init__(self, in_channels=3, out_channels=64):
         super(Stem, self).__init__()
+        self.out_channels = out_channels
         self.conv = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=2, padding=1)
         self.bn = nn.BatchNorm2d(64)
         self.relu = nn.ReLU()

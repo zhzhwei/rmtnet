@@ -39,11 +39,36 @@ def valid_model_2d(cfg, epoch, model, validloader, criterion, voting, best_metri
                 ])
             scan_loss = criterion(scan_output, label_tensor)
 
-        scan_pred_list = []
-        for j in range(len(label)):
-            scan_pred_j = np.array([stats.mode(scan_pred[j*32:(j+1)*32].detach().cpu().numpy())[0][0]])
-            scan_pred_list.append(scan_pred_j)
-        scan_pred = np.concatenate(scan_pred_list)
+        if voting == "majority":
+            scan_pred_list = []
+            for j in range(len(label)):
+                scan_pred_j = np.array([stats.mode(scan_pred[j*32:(j+1)*32].detach().cpu().numpy())[0][0]])
+                scan_pred_list.append(scan_pred_j)
+            scan_pred = np.concatenate(scan_pred_list)
+        elif voting == "weighted":
+            scan_pred_list = []
+            for j in range(len(label)):
+                scan_pred_j = np.array([round(np.average(scan_pred[j*32:(j+1)*32].detach().cpu().numpy(), weights=scan_score[j*32:(j+1)*32]))])
+                scan_pred_list.append(scan_pred_j)
+            scan_pred = np.concatenate(scan_pred_list)
+        elif voting == "prob_sum":
+            scan_pred_list = []
+            for j in range(len(label)):
+                scan_pred_j = np.array([np.argmax(np.sum(scan_probs[j*32:(j+1)*32].detach().cpu().numpy(), axis=0))])
+                scan_pred_list.append(scan_pred_j)
+            scan_pred = np.concatenate(scan_pred_list)
+        elif voting == "average":
+            scan_pred_list = []
+            for j in range(len(label)):
+                scan_pred_j = np.array([np.argmax(np.mean(scan_probs[j*32:(j+1)*32].detach().cpu().numpy(), axis=0))])
+                scan_pred_list.append(scan_pred_j)
+            scan_pred = np.concatenate(scan_pred_list)
+        elif voting == "median":
+            scan_pred_list = []
+            for j in range(len(label)):
+                scan_pred_j = np.array([np.argmax(np.median(scan_probs[j*32:(j+1)*32].detach().cpu().numpy(), axis=0))])
+                scan_pred_list.append(scan_pred_j)
+            scan_pred = np.concatenate(scan_pred_list)
 
         scan_preds.extend(scan_pred.tolist())
         scan_labels.extend(label.detach().cpu().numpy().tolist())
@@ -82,7 +107,7 @@ def valid_model_2d(cfg, epoch, model, validloader, criterion, voting, best_metri
         }
     save_filename = f"{cfg.NAME}_{str(f1)}.pth"
     
-    save_checkpoint(save_dict, root=cfg.DIRS.WEIGHTS, filename=save_filename)
+    # save_checkpoint(save_dict, root=cfg.DIRS.WEIGHTS, filename=save_filename)
 
     best_metric = max(f1, best_metric)
         

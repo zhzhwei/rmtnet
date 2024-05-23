@@ -8,12 +8,9 @@ from utils import build_scheduler, load_checkpoint
 from utils import build_model
 
 from config.cfg_defaults import get_cfg_defaults
-# from core.scan_loader_2d import build_dataloader_2d
-# from core.train_model_2d import train_model_2d
-# from core.valid_model_2d import valid_model_2d
-from core.slice_loader import build_dataloader
-from core.train_model import train_model
-from core.valid_model import valid_model
+from core.scan_loader_2d import build_dataloader_2d
+from core.train_model_2d import train_model_2d
+from core.valid_model_2d import valid_model_2d
 from core.rmtnet import RMTNet
 
 import torch.multiprocessing
@@ -24,6 +21,8 @@ warnings.filterwarnings("ignore")
 torch.multiprocessing.set_sharing_strategy("file_system")
 scaler = GradScaler()
 
+sys.stdout = open('./logs/training.out','a')
+
 def main(cfg, args):
 
     # Declare variables
@@ -31,8 +30,8 @@ def main(cfg, args):
     start_epoch = 0
     mode = args.mode
 
-    trainloader = build_dataloader(cfg, mode="train")
-    validloader = build_dataloader(cfg, mode="valid")
+    trainloader = build_dataloader_2d(cfg, mode="train")
+    validloader = build_dataloader_2d(cfg, mode="valid")
 
     # Define model/loss/optimizer/Scheduler
     model = RMTNet(num_classes=cfg.MODEL.NUM_CLASSES)
@@ -53,7 +52,7 @@ def main(cfg, args):
     # Run Script
     if mode == "train":
         for epoch in range(start_epoch, cfg.TRAIN.EPOCHES):
-            train_loss = train_model(
+            train_loss = train_model_2d(
                 cfg,
                 epoch,
                 model,
@@ -61,23 +60,22 @@ def main(cfg, args):
                 loss,
                 scheduler,
                 optimizer,
-                scaler
+                scaler,
+                cfg.TRAIN.EPOCHES,
+                cfg.TRAIN.VOTING
             )
-            best_metric = valid_model(
+            best_metric = valid_model_2d(
                 cfg,
-                mode,
                 epoch,
                 model,
                 validloader,
                 loss,
-                best_metric=best_metric,
-                save_prediction=False,
-                visual=False
+                cfg.TRAIN.VOTING,
+                best_metric=best_metric
             )
-
     elif mode == "valid":
-        valid_model(
-            cfg, mode, 0, model, validloader, loss, best_metric=best_metric, save_prediction=True, visual=True
+        valid_model_2d(
+            cfg, 0, model, validloader, loss, cfg.TRAIN.VOTING, best_metric=best_metric
         )
 
 if __name__ == "__main__":
@@ -89,7 +87,7 @@ if __name__ == "__main__":
 
     if args.config != "":
         cfg.merge_from_file(args.config)
-    # print(cfg)
+    print(cfg)
 
     # Set seed for reproducible result
     setup_determinism(seed)
