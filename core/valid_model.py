@@ -72,35 +72,26 @@ def valid_model(
                 output = model(image)
                 end = time.time()
 
-            # Output prediction
             sigmoid = nn.Sigmoid()
             probs = sigmoid(output)
             pred = torch.argmax(probs, 1)
             probs = probs.cpu().numpy()
             all_probs.append(probs)
-            # print(probs.shape)
-            # print(pred.shape)
-            # print("_--------------_")
             total_time += end - start
  
-            # Compute loss
             loss = criterion(output, target)
 
-            # Record loss
             losses.update(loss.item() * cfg.SOLVER.GD_STEPS, target.size(0))
-            tbar.set_description("Valid loss: %.9f" % (losses.avg))
+            tbar.set_description("VALID: epoch: %d, valid loss: %.9f" % (epoch + 1, losses.avg))
 
-            # Convert target, prediction to numpy
             target = list(target.detach().cpu().numpy())
             pred = list(pred.detach().cpu().numpy())
-            # print(pred)
             filename = list(filename)
             targets += target
             preds += pred
             filenames += filename
             study_IDs += study_ID
             seriesNumbers += list(np.array(seriesNumber))
-    # print(f"Inference time =", (total_time / len(tbar)) / 100)
     all_targets = []
     for idx in range(len(targets)):
         cur = [0] * 4
@@ -137,12 +128,9 @@ def valid_model(
         #     epoch,
         # )
 
-        # CHECKPOINT
         is_best = f1 > best_metric
         best_metric = max(f1, best_metric)
     
-        # Save All slices prediction for scan prediction and bootstraping
-        
     if save_prediction:
         data.to_csv(f"eval_{mode}.csv", index=False)
     

@@ -58,7 +58,7 @@ def train_model(
         # Record loss
         losses.update(loss.item() * cfg.SOLVER.GD_STEPS, target.size(0))
         tbar.set_description(
-            "Epoch: %d, Train loss: %.9f, learning rate: %.9f"
+            "TRAIN: epoch: %d, train loss: %.9f, learning rate: %.9f"
             % (epoch + 1, losses.avg, optimizer.param_groups[-1]["lr"])
         )
     # print("Train loss: %.9f, learning rate: %.6f" %
