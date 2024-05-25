@@ -27,48 +27,48 @@ class Data(Dataset):
             mode (str): Model running mode
         """
         self.data_csv = data_csv
-        self.imgs = data_csv["image"].values
-        self.labels = data_csv["label"].values
-        self.study_IDs = data_csv["study"].values
-        self.series = data_csv["series"].values
+        self.study_id = data_csv["study_id"].values
+        self.scan_id = data_csv["scan_id"].values
+        self.slice_dir = data_csv["slice_dir"].values
+        self.label = data_csv["label"].values
         self.cfg = cfg
 
         # count the number of samples in each class
         class_counts = data_csv['label'].value_counts().to_dict()
         max_count = max(class_counts.values())
 
-        # create a list of series that need to be augmented
-        self.augmented_series = []
+        # create a list of slice_dirs that need to be augmented
+        self.augmented_data = []
         for label, count in class_counts.items():
             if count < max_count:
                 deficit = max_count - count
-                label_series = self.data_csv[self.data_csv['label'] == label]['series'].values
+                slice_dirs = self.data_csv[self.data_csv['label'] == label]['slice_dir'].values
                 for _ in range(deficit):
-                    selected_series = random.choice(label_series)
-                    self.augmented_series.append((selected_series, label))  # save the series and label
+                    selected_slice_dir = random.choice(slice_dirs)
+                    self.augmented_data.append((selected_slice_dir, label))  # save the slice_dir and label
 
     def __len__(self):
-        return len(self.imgs) + len(self.augmented_series)
+        return len(self.slice_dir) + len(self.augmented_data)
 
     def __getitem__(self, idx):
-        if idx < len(self.imgs):
-            filename = self.imgs[idx]
-            study_ID = self.study_IDs[idx]
-            series = self.series[idx]
-            label = self.labels[idx]
+        if idx < len(self.slice_dir):
+            slice_dir = self.slice_dir[idx]
+            study_id = self.study_id[idx]
+            scan_id = self.scan_id[idx]
+            label = self.label[idx]
         else:
-            series, label = self.augmented_series[idx - len(self.imgs)]
-            filename = self.data_csv[self.data_csv.series == series].image.values[0]
-            study_ID = self.data_csv[self.data_csv.series == series].study.values[0]
+            slice_dir, label = self.augmented_data[idx - len(self.slice_dir)]
+            study_id = "/".join(slice_dir.split("/")[-3:-2])
+            scan_id = "/".join(slice_dir.split("/")[-2:-1])
 
-        img = cv2.imread(filename)
-        img = cv2.resize(img, self.cfg.DATA.SIZE, interpolation=cv2.INTER_AREA)
+        slice = cv2.imread(slice_dir)
+        slice = cv2.resize(slice, self.cfg.DATA.SIZE, interpolation=cv2.INTER_AREA)
 
-        img = transforms(image=img)['image']
-        img = img / 255.0
-        img = img.transpose(2, 0, 1)
+        slice = transforms(image=slice)['image']
+        slice = slice / 255.0
+        slice = slice.transpose(2, 0, 1)
 
-        return filename, study_ID, series, img, label
+        return slice_dir, study_id, scan_id, slice, label
 
 def build_dataloader(cfg, mode="train"):
     """Build dataloader
