@@ -34,7 +34,7 @@ def train_model(
     model.cuda()
 
     tbar = tqdm(dataloader)
-    for i, (filename, study_ID, seriesNumber, image, target) in enumerate(tbar):
+    for i, (slice_dir, study_id, scan_id, image, target) in enumerate(tbar):
         image = image.float()
         # print(torch.min(image), torch.max(image))
         # print(image.shape)
