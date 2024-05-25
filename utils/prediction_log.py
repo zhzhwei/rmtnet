@@ -72,7 +72,7 @@ def record_output(
 
     # Save wrongly predicted images
     gts = [0, 1, 2, 3]
-    lbs = ["Non", "Venous", "Aterial", "Others"]
+    lbs = ["Non", "Venous", "Arterial", "Others"]
     save_dir = os.path.join(log_dir, "wrong_labeled")
     if not os.path.isdir(save_dir):
         os.mkdir(save_dir)

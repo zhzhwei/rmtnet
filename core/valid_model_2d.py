@@ -87,9 +87,9 @@ def valid_model_2d(cfg, epoch, model, validloader, criterion, voting, best_metri
     )
 
     if cfg.MODEL.NUM_CLASSES == 3:
-        label_names=["Non", "Venous", "Aterial"]
+        label_names=["Non", "Venous", "Arterial"]
     elif cfg.MODEL.NUM_CLASSES == 4:
-        label_names=["Non", "Venous", "Aterial", "Others"]
+        label_names=["Non", "Venous", "Arterial", "Others"]
 
     report = classification_report(
         scan_labels,

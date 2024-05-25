@@ -17,8 +17,8 @@ from sklearn.metrics import roc_auc_score, roc_curve, auc
 
 import matplotlib.pyplot as plt
 
-target_names_dict = {"Non": 0, "Venous": 1, "Aterial": 2, "Others": 3}
-map_id_name = {0: "Non Contrast", 1: "Venous", 2: "Aterial", 3: "Others"}
+target_names_dict = {"Non": 0, "Venous": 1, "Arterial": 2, "Others": 3}
+map_id_name = {0: "Non Contrast", 1: "Venous", 2: "Arterial", 3: "Others"}
 
 def valid_model(
     cfg,
@@ -178,7 +178,7 @@ def calculate_metrics(cfg, data, targets, preds, study_IDs, seriesNumbers, filen
     report = classification_report(
         targets,
         preds,
-        target_names=["Non", "Venous", "Aterial", "Others"],
+        target_names=["Non", "Venous", "Arterial", "Others"],
         digits=4,
     )
     print(report)
