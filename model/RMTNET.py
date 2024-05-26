@@ -4,9 +4,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange
 from torchvision.models import resnet50
-from ViT import ViT
-from VT import Transformer
-from LMHSA import LightMutilHeadSelfAttention
+from model.ViT import ViT
+from model.VT import Transformer
+from model.LMHSA import LightMutilHeadSelfAttention
 
 class Stem(nn.Module):
     def __init__(self, in_channels=3, out_channels=64):
@@ -35,9 +35,9 @@ class LinearEmbedding(nn.Module):
         x = rearrange(x, 'b h w c -> b c h w')
         return x
 
-class RMTNet(nn.Module):
+class RMTNET(nn.Module):
     def __init__(self, img_size=16, patch_size=16, num_classes=4, embed_dim=768, depth=12, num_heads=12, mlp_dim=2048, dim_head=64, dropout=0.1, emb_dropout=0.1):
-        super(RMTNet, self).__init__()
+        super(RMTNET, self).__init__()
 
         # Stem
         # self.stem = Stem(in_channels=3, out_channels=64)

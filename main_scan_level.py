@@ -11,7 +11,7 @@ from config.cfg_defaults import get_cfg_defaults
 from core.scan_loader_2d import build_dataloader_2d
 from core.train_model_2d import train_model_2d
 from core.valid_model_2d import valid_model_2d
-from core.rmtnet import RMTNet
+from model.RMTNET import RMTNET
 
 import torch.multiprocessing
 from torch.cuda.amp import GradScaler
@@ -34,7 +34,7 @@ def main(cfg, args):
     validloader = build_dataloader_2d(cfg, mode="valid")
 
     # Define model/loss/optimizer/Scheduler
-    model = RMTNet(num_classes=cfg.MODEL.NUM_CLASSES)
+    model = RMTNET(num_classes=cfg.MODEL.NUM_CLASSES)
 
     if cfg.MODEL.NUM_CLASSES == 3:
         weight=torch.Tensor([0.1, 0.1, 0.1])

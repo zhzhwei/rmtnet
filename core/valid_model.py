@@ -190,7 +190,7 @@ def calculate_metrics(cfg, data, labels, preds, study_ids, scan_ids, slice_dirs)
     data["labels"] = labels
     data = pd.DataFrame(data)
     all_series = []
-    for (studyuid, seriesuid), tmp_df in data.groupby(['study_id', 'scan_id']):
+    for (studyuid, seriesuid), tmp_df in data.groupby(['study_ids', 'scan_ids']):
         preds = tmp_df['preds'].tolist()
         labels = tmp_df['labels'].tolist()
         f1_series = f1_score(labels, preds, average='weighted')
