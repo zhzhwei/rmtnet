@@ -104,17 +104,17 @@ def valid_model(
         plot_roc_curves(all_target, all_probs, map_id_name)
 
     # Calculate Metrics
-    data, f1, f1_series = calculate_metrics(cfg, data, targets, preds, study_ids, scan_ids, slice_dirs)
+    data, f1 = calculate_metrics(cfg, data, targets, preds, study_ids, scan_ids, slice_dirs)
     
-    # save_dict = {
-    #         "epoch": epoch + 1,
-    #         "arch": cfg.NAME,
-    #         "state_dict": model.state_dict(),
-    #         "best_metric": best_metric,
-    #     }
-    # save_slice_dir = f"{cfg.NAME}_{str(f1)}_{str(f1_series)}.pth"
+    save_dict = {
+            "epoch": epoch + 1,
+            "arch": cfg.NAME,
+            "state_dict": model.state_dict(),
+            "best_metric": best_metric,
+        }
+    save_filename = f"{cfg.NAME}_{str(f1)}.pth"
     
-    # save_checkpoint(save_dict, root=cfg.DIRS.WEIGHTS, slice_dir=save_slice_dir)
+    save_checkpoint(save_dict, root=cfg.DIRS.WEIGHTS, filename=save_filename)
 
     if mode == "train":
         # writer.add_scalars(
@@ -189,15 +189,14 @@ def calculate_metrics(cfg, data, labels, preds, study_ids, scan_ids, slice_dirs)
     data["preds"] = preds
     data["labels"] = labels
     data = pd.DataFrame(data)
-    all_series = []
-    for (studyuid, seriesuid), tmp_df in data.groupby(['study_ids', 'scan_ids']):
-        preds = tmp_df['preds'].tolist()
-        labels = tmp_df['labels'].tolist()
-        f1_series = f1_score(labels, preds, average='weighted')
-        all_series.append(f1_series)
-    all_series = np.array(all_series)
-    f1_series = np.mean(all_series)
+    # all_series = []
+    # for (studyuid, seriesuid), tmp_df in data.groupby(['study_ids', 'scan_ids']):
+    #     preds = tmp_df['preds'].tolist()
+    #     labels = tmp_df['labels'].tolist()
+    #     f1_series = f1_score(labels, preds, average='weighted')
+    #     all_series.append(f1_series)
+    # all_series = np.array(all_series)
+    # f1_series = np.mean(all_series)
     # print("series", f1_series)
     
-    return data, f1, f1_series
-
+    return data, f1
