@@ -2,7 +2,7 @@ import os
 import cv2
 import torch
 import warnings
-from captum.attr import Saliency, LayerGradCam
+from captum.attr import Saliency, LayerGradCam, visualization
 
 from matplotlib import pyplot as plt
 from model.RMTNET import RMTNET
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     
     slice_paths = [f"{slice_paths_root}/{slice}" for slice in os.listdir(slice_paths_root)]
     slice_paths = sorted(slice_paths, key=lambda x: int(x.split('.')[-2]))
-    slice_paths = slice_paths[:20]
+    slice_paths = slice_paths[:30]
     
     # Get the last convolutional layer in the model
     last_conv_layer = get_last_conv_layer(model)
@@ -71,18 +71,23 @@ if __name__ == "__main__":
     for slice_path in slice_paths:
         slice = cv2.imread(slice_path)
         slice = cv2.resize(slice, (256,256), interpolation=cv2.INTER_AREA)
-        slice = transforms(image=slice)['image']
-        slice = slice / 255.0
+        # slice = transforms(image=slice)['image']
+        slice_npy = slice / 255.0   
         
-        slice = torch.from_numpy(slice.transpose(2, 0, 1)).float().unsqueeze(0)
-        slice.requires_grad_()
+        slice = torch.from_numpy(slice_npy.transpose(2, 0, 1)).float().unsqueeze(0)
+        # slice.requires_grad_()
         
-        grad_cam = LayerGradCam(model, last_conv_layer)
+        # grad_cam = LayerGradCam(model, last_conv_layer)
+        grad_cam = Saliency(model)
         cam = grad_cam.attribute(slice, target=target_class)
         cam = cam.squeeze().detach().numpy()
         cam = cv2.resize(cam, (256,256))
         
-        plt.imshow(cam, cmap='jet')
-        plt.axis('off') 
+        # plt.imshow(cam, cmap='jet')
+        # plt.axis('off') 
+        # plt.savefig(f"{saliency_output}/{slice_path.split('/')[-1]}", bbox_inches='tight', pad_inches=0)
+        # plt.close()
+        
+        fig, ax = plt.subplots()
+        ax = visualization.visualize_image_attr(cam, slice_npy, "blended_heat_map", alpha_overlay = 0.3, sign = "positive", outlier_perc=5)
         plt.savefig(f"{saliency_output}/{slice_path.split('/')[-1]}", bbox_inches='tight', pad_inches=0)
-        plt.close()
